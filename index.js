@@ -28,7 +28,8 @@ async function run() {
 
     const collegiateCollection = client.db("collegiateDb").collection("collegiate");
     const collegeCollection = client.db("collegiateDb").collection("college");
-    
+    const userInfoCollection = client.db("collegiateDb").collection("userInfo");
+
     app.get('/collegiate', async(req, res) =>{
         const result = await collegiateCollection.find().toArray();
         res.send(result);
@@ -36,6 +37,19 @@ async function run() {
     app.get('/college', async(req, res) =>{
         const result = await collegeCollection.find().toArray();
         res.send(result);
+    })
+
+    app.post('/userInfo', async (req, res) => {
+      const userInfo = req.body;
+      console.log(userInfo);
+      const query = { email: userInfo.email, name: userInfo.name }
+      const existingUser = await userInfoCollection.findOne(query);
+      console.log(existingUser)
+      if (existingUser) {
+        return res.send({ message: 'userInfo already exists' })
+      }
+      const result = await userInfoCollection.insertOne(userInfo);
+      res.send(result);
     })
   
     // Send a ping to confirm a successful connection
